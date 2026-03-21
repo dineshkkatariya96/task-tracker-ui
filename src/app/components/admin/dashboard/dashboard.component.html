@@ -1,0 +1,285 @@
+<div class="top-header">
+  <div class="header-left">
+    <div class="header-logo">
+      <mat-icon>task_alt</mat-icon>
+    </div>
+    <div>
+      <div class="header-title">Task Tracker</div>
+      <div class="header-subtitle">Admin Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="admin-badge">
+      <mat-icon>shield</mat-icon>
+      Admin
+    </div>
+    <button mat-icon-button class="logout-btn"
+            (click)="logout()" matTooltip="Logout">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div class="dashboard-container">
+
+  <div class="stats-row">
+    <mat-card class="stat-card total">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number">{{ tasks.length }}</div>
+          <div class="stat-label">Total Tasks</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card overdue">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number">{{ overdueTasks.length }}</div>
+          <div class="stat-label">Overdue Tasks</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card employees">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>group</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number">{{ employees.length }}</div>
+          <div class="stat-label">Employees</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="controls-row">
+    <div class="tab-buttons">
+      <button mat-raised-button
+              [color]="activeTab === 'all' ? 'primary' : ''"
+              (click)="activeTab = 'all'; loadTasks()">
+        <mat-icon>list</mat-icon>
+        All Tasks ({{ tasks.length }})
+      </button>
+      <button mat-raised-button
+              [color]="activeTab === 'overdue' ? 'warn' : ''"
+              (click)="activeTab = 'overdue'; loadOverdueTasks()">
+        <mat-icon>schedule</mat-icon>
+        Overdue ({{ overdueTasks.length }})
+      </button>
+    </div>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Filter by Employee</mat-label>
+      <mat-icon matPrefix>person_search</mat-icon>
+      <mat-select [(ngModel)]="selectedEmployeeId"
+                  (selectionChange)="filterByEmployee()"
+                  panelClass="employee-filter-panel">
+        <mat-option [value]="null">All Employees</mat-option>
+        <mat-option *ngFor="let emp of employees" [value]="emp.id">
+          {{ emp.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button class="create-btn"
+            (click)="openCreateTask()">
+      <mat-icon>add</mat-icon>
+      Create Task
+    </button>
+  </div>
+
+  <mat-card class="tasks-card">
+    <mat-card-content style="padding:0">
+
+      <table mat-table [dataSource]="filteredTasks" class="full-width"
+             *ngIf="activeTab === 'all'">
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let task">
+            <strong>{{ task.title }}</strong>
+            <div style="font-size:12px;color:#999;margin-top:2px">
+              {{ task.description }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="assignee">
+          <th mat-header-cell *matHeaderCellDef>Assigned To</th>
+          <td mat-cell *matCellDef="let task">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:32px;height:32px;border-radius:50%;
+                          background:linear-gradient(135deg,#667eea,#764ba2);
+                          display:flex;align-items:center;justify-content:center;
+                          color:white;font-size:13px;font-weight:600;
+                          flex-shrink:0">
+                {{ (task.assigneeName || 'U')[0].toUpperCase() }}
+              </div>
+              {{ task.assigneeName || 'Unassigned' }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell *matHeaderCellDef>Priority</th>
+          <td mat-cell *matCellDef="let task">
+            <span class="priority-chip"
+                  [class.high]="task.priority === 'HIGH'"
+                  [class.medium]="task.priority === 'MEDIUM'"
+                  [class.low]="task.priority === 'LOW'">
+              {{ task.priority }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let task">
+            <span class="status-chip"
+                  [class.open]="task.status === 'OPEN'"
+                  [class.in-progress]="task.status === 'IN_PROGRESS'"
+                  [class.done]="task.status === 'DONE'"
+                  [class.overdue]="task.status === 'OVERDUE'">
+              {{ task.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dueDate">
+          <th mat-header-cell *matHeaderCellDef>Due Date</th>
+          <td mat-cell *matCellDef="let task">
+            <div style="display:flex;align-items:center;gap:4px">
+              <mat-icon style="font-size:16px;width:16px;
+                               height:16px;color:#999">event</mat-icon>
+              {{ task.dueDate }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let task">
+            <button mat-icon-button color="primary"
+                    (click)="openEditTask(task)"
+                    matTooltip="Edit task">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn"
+                    (click)="deleteTask(task.id)"
+                    matTooltip="Delete task">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            style="transition:background 0.2s"
+            onmouseover="this.style.background='#f8f9ff'"
+            onmouseout="this.style.background=''">
+        </tr>
+      </table>
+
+      <table mat-table [dataSource]="overdueTasks" class="full-width"
+             *ngIf="activeTab === 'overdue'">
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let task">
+            <strong>{{ task.title }}</strong>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="assignee">
+          <th mat-header-cell *matHeaderCellDef>Assigned To</th>
+          <td mat-cell *matCellDef="let task">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:32px;height:32px;border-radius:50%;
+                          background:linear-gradient(135deg,#f44336,#e91e63);
+                          display:flex;align-items:center;justify-content:center;
+                          color:white;font-size:13px;font-weight:600;
+                          flex-shrink:0">
+                {{ (task.assigneeName || 'U')[0].toUpperCase() }}
+              </div>
+              {{ task.assigneeName || 'Unassigned' }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell *matHeaderCellDef>Priority</th>
+          <td mat-cell *matCellDef="let task">
+            <span style="padding:4px 10px;border-radius:20px;
+                         font-size:12px;font-weight:600;
+                         background:#ffebee;color:#c62828">
+              {{ task.priority }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let task">
+            <span style="padding:4px 10px;border-radius:20px;
+                         font-size:12px;font-weight:600;
+                         background:#ffebee;color:#c62828">
+              OVERDUE
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dueDate">
+          <th mat-header-cell *matHeaderCellDef>Due Date</th>
+          <td mat-cell *matCellDef="let task">
+            <div style="display:flex;align-items:center;gap:4px">
+              <mat-icon style="font-size:16px;width:16px;
+                               height:16px;color:#f44336">event</mat-icon>
+              {{ task.dueDate }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let task">
+            <button mat-icon-button color="primary"
+                    (click)="openEditTask(task)"
+                    matTooltip="Edit task">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn"
+                    (click)="deleteTask(task.id)"
+                    matTooltip="Delete task">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div *ngIf="filteredTasks.length === 0 && activeTab === 'all'"
+           class="empty-state">
+        <mat-icon>assignment_late</mat-icon>
+        <p>No tasks found. Create your first task!</p>
+      </div>
+
+      <div *ngIf="overdueTasks.length === 0 && activeTab === 'overdue'"
+           class="empty-state">
+        <mat-icon>check_circle</mat-icon>
+        <p>No overdue tasks. Everything is on track!</p>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+</div>

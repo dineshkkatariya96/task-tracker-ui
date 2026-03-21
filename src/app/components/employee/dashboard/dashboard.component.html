@@ -1,0 +1,172 @@
+<div class="top-header">
+  <div class="header-left">
+    <div class="header-logo">
+      <mat-icon>task_alt</mat-icon>
+    </div>
+    <div>
+      <div class="header-title">Task Tracker</div>
+      <div class="header-subtitle">Employee Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="user-badge">
+      <div class="user-avatar">
+        {{ email[0]?.toUpperCase() }}
+      </div>
+      <div class="user-info">
+        <div class="user-email">{{ email }}</div>
+        <div class="user-role">Employee</div>
+      </div>
+    </div>
+    <button mat-icon-button class="logout-btn"
+            (click)="logout()" matTooltip="Logout">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div class="dashboard-container">
+
+  <div class="stats-row">
+    <mat-card class="stat-card total">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number">{{ myTasks.length }}</div>
+          <div class="stat-label">My Tasks</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card completed">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number">{{ completedTasksCount }}</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card overdue">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number">{{ overdueTasks.length }}</div>
+          <div class="stat-label">Overdue</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="tab-row">
+    <button mat-raised-button
+            [color]="activeTab === 'my' ? 'primary' : ''"
+            (click)="activeTab = 'my'; loadMyTasks()">
+      <mat-icon>assignment_ind</mat-icon>
+      My Tasks ({{ myTasks.length }})
+    </button>
+    <button mat-raised-button
+            [color]="activeTab === 'overdue' ? 'warn' : ''"
+            (click)="activeTab = 'overdue'; loadOverdueTasks()">
+      <mat-icon>schedule</mat-icon>
+      Overdue ({{ overdueTasks.length }})
+    </button>
+  </div>
+
+  <div class="tasks-grid" *ngIf="activeTab === 'my'">
+    <mat-card *ngFor="let task of myTasks" class="task-card">
+      <mat-card-content>
+        <div class="task-header">
+          <div>
+            <div class="task-title">{{ task.title }}</div>
+            <div class="task-date">
+              <mat-icon style="font-size:14px;width:14px;height:14px">
+                event
+              </mat-icon>
+              Due: {{ task.dueDate }}
+            </div>
+          </div>
+        </div>
+
+        <p class="task-description">{{ task.description }}</p>
+
+        <div class="chip-row">
+          <span class="priority-badge" [class]="task.priority">
+            {{ task.priority }}
+          </span>
+          <span class="status-badge" [class]="task.status">
+            {{ task.status }}
+          </span>
+        </div>
+
+        <mat-form-field appearance="outline" class="status-select">
+          <mat-label>Update Status</mat-label>
+          <mat-select [value]="task.status"
+                      (selectionChange)="updateStatus(task, $event.value)">
+            <mat-option *ngFor="let s of statuses" [value]="s">
+              {{ s }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="myTasks.length === 0" class="empty-state">
+      <mat-icon>inbox</mat-icon>
+      <p>No tasks assigned to you yet.</p>
+    </div>
+  </div>
+
+  <div class="tasks-grid" *ngIf="activeTab === 'overdue'">
+    <mat-card *ngFor="let task of overdueTasks" class="task-card">
+      <mat-card-content>
+        <div class="task-header">
+          <div>
+            <div class="task-title">{{ task.title }}</div>
+            <div class="task-date" style="color:#f44336">
+              <mat-icon style="font-size:14px;width:14px;
+                               height:14px;color:#f44336">
+                warning
+              </mat-icon>
+              Due: {{ task.dueDate }}
+            </div>
+          </div>
+        </div>
+
+        <p class="task-description">{{ task.description }}</p>
+
+        <div class="chip-row">
+          <span class="priority-badge" [class]="task.priority">
+            {{ task.priority }}
+          </span>
+          <span class="status-badge OVERDUE">OVERDUE</span>
+        </div>
+
+        <mat-form-field appearance="outline" class="status-select">
+          <mat-label>Update Status</mat-label>
+          <mat-select [value]="task.status"
+                      (selectionChange)="updateStatus(task, $event.value)">
+            <mat-option *ngFor="let s of statuses" [value]="s">
+              {{ s }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="overdueTasks.length === 0" class="empty-state">
+      <mat-icon>check_circle</mat-icon>
+      <p>No overdue tasks. Great work!</p>
+    </div>
+  </div>
+
+</div>

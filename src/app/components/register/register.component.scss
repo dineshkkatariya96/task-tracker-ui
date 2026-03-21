@@ -1,0 +1,89 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #f3f0ff 0%, #e8f4ff 50%, #f0fff8 100%);
+  padding: 24px;
+}
+
+.register-card {
+  width: 440px;
+  padding: 40px 36px;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.18) !important;
+  border: 1px solid rgba(102, 126, 234, 0.1) !important;
+  background: white !important;
+
+  mat-card-content {
+    padding: 0 !important;
+  }
+
+  mat-card-actions {
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+  }
+}
+
+.logo-section {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .logo-icon {
+    width: 68px;
+    height: 68px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+
+    mat-icon {
+      color: white;
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2d2d5e;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  p {
+    color: #888;
+    font-size: 14px;
+  }
+}
+
+.full-width { width: 100%; }
+
+.register-btn {
+  height: 52px !important;
+  font-size: 16px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+  letter-spacing: 0.5px !important;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5) !important;
+  }
+}
+
+.login-link {
+  color: #667eea !important;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}

@@ -1,0 +1,103 @@
+<div class="form-header">
+  <div class="form-icon">
+    <mat-icon>{{ isEdit ? 'edit_note' : 'add_task' }}</mat-icon>
+  </div>
+  <div>
+    <h2 class="form-title">{{ isEdit ? 'Edit Task' : 'Create New Task' }}</h2>
+    <p class="form-subtitle">{{ isEdit ? 'Update task details below' : 'Fill in the details to create a task' }}</p>
+  </div>
+</div>
+
+<mat-dialog-content class="form-content">
+
+  <div class="field-group">
+    <label class="field-label">
+      <mat-icon>title</mat-icon>
+      Task Title <span class="required">*</span>
+    </label>
+    <mat-form-field appearance="outline" class="full-width">
+      <input matInput [(ngModel)]="task.title"
+             placeholder="Enter a clear task title"/>
+    </mat-form-field>
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">
+      <mat-icon>description</mat-icon>
+      Description
+    </label>
+    <mat-form-field appearance="outline" class="full-width">
+      <textarea matInput [(ngModel)]="task.description"
+                placeholder="Describe what needs to be done..."
+                rows="3"></textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="two-col">
+
+    <div class="field-group">
+      <label class="field-label">
+        <mat-icon>flag</mat-icon>
+        Priority <span class="required">*</span>
+      </label>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-select [(ngModel)]="task.priority"
+                    panelClass="employee-filter-panel">
+          <mat-option value="LOW">
+            <span class="priority-opt low">LOW</span>
+          </mat-option>
+          <mat-option value="MEDIUM">
+            <span class="priority-opt medium">MEDIUM</span>
+          </mat-option>
+          <mat-option value="HIGH">
+            <span class="priority-opt high">HIGH</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">
+        <mat-icon>event</mat-icon>
+        Due Date <span class="required">*</span>
+      </label>
+      <mat-form-field appearance="outline" class="full-width">
+        <input matInput type="date" [(ngModel)]="task.dueDate"/>
+      </mat-form-field>
+    </div>
+
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">
+      <mat-icon>person_add</mat-icon>
+      Assign To <span class="required">*</span>
+    </label>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-select [(ngModel)]="task.assigneeId"
+                  placeholder="Select an employee"
+                  panelClass="employee-filter-panel">
+        <mat-option *ngFor="let emp of employees" [value]="emp.id">
+          <div class="employee-option">
+            <div class="emp-avatar">{{ emp.name[0].toUpperCase() }}</div>
+            <div>
+              <div class="emp-name">{{ emp.name }}</div>
+              <div class="emp-email">{{ emp.email }}</div>
+            </div>
+          </div>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="form-actions">
+  <button mat-button class="cancel-btn" (click)="cancel()">
+    Cancel
+  </button>
+  <button mat-raised-button class="save-btn" (click)="save()">
+    <mat-icon>{{ isEdit ? 'save' : 'add_task' }}</mat-icon>
+    {{ isEdit ? 'Update Task' : 'Create Task' }}
+  </button>
+</mat-dialog-actions>

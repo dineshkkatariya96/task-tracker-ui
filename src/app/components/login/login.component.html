@@ -1,0 +1,48 @@
+<div class="login-container">
+  <mat-card class="login-card">
+
+    <div class="logo-section">
+      <div class="logo-icon">
+        <mat-icon>task_alt</mat-icon>
+      </div>
+      <h1>Task Tracker</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email address</mat-label>
+        <mat-icon matPrefix style="margin-right:8px;color:#999">email</mat-icon>
+        <input matInput type="email"
+               [(ngModel)]="email"
+               placeholder="you@example.com"/>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <mat-icon matPrefix style="margin-right:8px;color:#999">lock</mat-icon>
+        <input matInput type="password"
+               [(ngModel)]="password"
+               placeholder="Enter your password"
+               (keyup.enter)="login()"/>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button
+              class="full-width sign-in-btn"
+              [disabled]="loading"
+              (click)="login()">
+        <mat-icon *ngIf="!loading">login</mat-icon>
+        {{ loading ? 'Signing in...' : 'Sign In' }}
+      </button>
+
+      <button mat-button
+              class="full-width register-link"
+              (click)="goToRegister()">
+        Don't have an account? Register here
+      </button>
+    </mat-card-actions>
+
+  </mat-card>
+</div>

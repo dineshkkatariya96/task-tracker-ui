@@ -1,0 +1,67 @@
+<div class="register-container">
+  <mat-card class="register-card">
+
+    <div class="logo-section">
+      <div class="logo-icon">
+        <mat-icon>person_add</mat-icon>
+      </div>
+      <h1>Create Account</h1>
+      <p>Register as an employee</p>
+    </div>
+
+    <mat-card-content>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Full Name</mat-label>
+        <mat-icon matPrefix style="margin-right:8px;color:#999">person</mat-icon>
+        <input matInput [(ngModel)]="name" placeholder="John Doe"/>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email address</mat-label>
+        <mat-icon matPrefix style="margin-right:8px;color:#999">email</mat-icon>
+        <input matInput type="email" [(ngModel)]="email"
+               placeholder="you@example.com"/>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <mat-icon matPrefix style="margin-right:8px;color:#999">lock</mat-icon>
+        <input matInput
+               [type]="hidePassword ? 'password' : 'text'"
+               [(ngModel)]="password"
+               placeholder="Min 6 characters"/>
+        <button mat-icon-button matSuffix
+                (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Confirm Password</mat-label>
+        <mat-icon matPrefix style="margin-right:8px;color:#999">lock_outline</mat-icon>
+        <input matInput type="password"
+               [(ngModel)]="confirmPassword"
+               placeholder="Re-enter password"/>
+      </mat-form-field>
+
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button
+              class="full-width register-btn"
+              [disabled]="loading"
+              (click)="register()">
+        <mat-icon *ngIf="!loading">how_to_reg</mat-icon>
+        {{ loading ? 'Creating account...' : 'Create Account' }}
+      </button>
+
+      <button mat-button
+              class="full-width login-link"
+              (click)="goToLogin()">
+        Already have an account? Sign In
+      </button>
+    </mat-card-actions>
+
+  </mat-card>
+</div>
