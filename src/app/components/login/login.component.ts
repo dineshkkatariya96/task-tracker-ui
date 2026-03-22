@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -35,7 +35,8 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) {}
 
   login() {
@@ -47,10 +48,13 @@ export class LoginComponent {
     }
 
     this.loading = true;
+    this.cdr.detectChanges();
+
     this.authService.login({ email: this.email, password: this.password })
       .subscribe({
         next: (response) => {
           this.loading = false;
+          this.cdr.detectChanges();
           if (response.role === 'ADMIN') {
             this.router.navigate(['/admin']);
           } else {
@@ -59,6 +63,7 @@ export class LoginComponent {
         },
         error: () => {
           this.loading = false;
+          this.cdr.detectChanges();
           this.snackBar.open('Invalid email or password!', 'Close', {
             duration: 3000,
             panelClass: ['error-snackbar']
