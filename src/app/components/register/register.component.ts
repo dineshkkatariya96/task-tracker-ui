@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
+import { UI_MESSAGES } from '../../constants/ui-messages';
 
 @Component({
   selector: 'app-register',
@@ -44,17 +45,17 @@ export class RegisterComponent {
 
   register() {
     if (!this.name || !this.email || !this.password) {
-      this.snackBar.open('All fields are required!', 'Close', { duration: 3000 });
+      this.snackBar.open(UI_MESSAGES.register.allFieldsRequired, UI_MESSAGES.common.closeAction, { duration: 3000 });
       return;
     }
 
     if (this.password !== this.confirmPassword) {
-      this.snackBar.open('Passwords do not match!', 'Close', { duration: 3000 });
+      this.snackBar.open(UI_MESSAGES.register.passwordsDoNotMatch, UI_MESSAGES.common.closeAction, { duration: 3000 });
       return;
     }
 
     if (this.password.length < 6) {
-      this.snackBar.open('Password must be at least 6 characters!', 'Close', { duration: 3000 });
+      this.snackBar.open(UI_MESSAGES.register.passwordTooShort, UI_MESSAGES.common.closeAction, { duration: 3000 });
       return;
     }
 
@@ -69,7 +70,7 @@ export class RegisterComponent {
       next: () => {
         this.loading = false;
         this.cdr.detectChanges();
-        this.snackBar.open('Registration successful! Please login.', 'Close', {
+        this.snackBar.open(UI_MESSAGES.register.registrationSuccess, UI_MESSAGES.common.closeAction, {
           duration: 3000
         });
         this.router.navigate(['/login']);
@@ -78,8 +79,8 @@ export class RegisterComponent {
         this.loading = false;
         this.cdr.detectChanges();
         this.snackBar.open(
-          err.error || 'Registration failed. Try again.',
-          'Close',
+          err.error || UI_MESSAGES.register.registrationError,
+          UI_MESSAGES.common.closeAction,
           { duration: 4000 }
         );
       }

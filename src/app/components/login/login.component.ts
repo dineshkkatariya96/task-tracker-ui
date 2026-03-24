@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
+import { UI_MESSAGES } from '../../constants/ui-messages';
 
 @Component({
   selector: 'app-login',
@@ -41,7 +42,7 @@ export class LoginComponent {
 
   login() {
     if (!this.email || !this.password) {
-      this.snackBar.open('Please enter email and password!', 'Close', {
+      this.snackBar.open(UI_MESSAGES.login.credentialsRequired, UI_MESSAGES.common.closeAction, {
         duration: 3000
       });
       return;
@@ -64,7 +65,7 @@ export class LoginComponent {
         error: () => {
           this.loading = false;
           this.cdr.detectChanges();
-          this.snackBar.open('Invalid email or password!', 'Close', {
+          this.snackBar.open(UI_MESSAGES.login.invalidCredentials, UI_MESSAGES.common.closeAction, {
             duration: 3000,
             panelClass: ['error-snackbar']
           });

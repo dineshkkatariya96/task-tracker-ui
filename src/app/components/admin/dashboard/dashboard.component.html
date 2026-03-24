@@ -76,25 +76,95 @@
       </button>
     </div>
 
-    <mat-form-field appearance="outline" class="filter-field">
-      <mat-label>Filter by Employee</mat-label>
-      <mat-icon matPrefix>person_search</mat-icon>
-      <mat-select [(ngModel)]="selectedEmployeeId"
-                  (selectionChange)="filterByEmployee()"
-                  panelClass="employee-filter-panel">
-        <mat-option [value]="null">All Employees</mat-option>
-        <mat-option *ngFor="let emp of employees" [value]="emp.id">
-          {{ emp.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
     <button mat-raised-button class="create-btn"
-            (click)="openCreateTask()">
+            (click)="openCreateTask()"
+            style="margin-left:auto">
       <mat-icon>add</mat-icon>
       Create Task
     </button>
   </div>
+
+  <mat-card class="filter-card" *ngIf="activeTab === 'all'">
+    <mat-card-content>
+      <div class="filter-header">
+        <div class="filter-title">
+          <mat-icon>filter_list</mat-icon>
+          Filters
+          <span class="filter-count" *ngIf="activeFiltersCount > 0">
+            {{ activeFiltersCount }} active
+          </span>
+        </div>
+        <button mat-button class="clear-btn"
+                *ngIf="activeFiltersCount > 0"
+                (click)="clearFilters()">
+          <mat-icon>clear</mat-icon>
+          Clear all
+        </button>
+      </div>
+
+      <div class="filter-row">
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Employee</mat-label>
+          <mat-icon matPrefix>person_search</mat-icon>
+          <mat-select [(ngModel)]="selectedEmployeeId"
+                      (selectionChange)="applyFilters()"
+                      panelClass="employee-filter-panel">
+            <mat-option [value]="null">All Employees</mat-option>
+            <mat-option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Priority</mat-label>
+          <mat-icon matPrefix>flag</mat-icon>
+          <mat-select [(ngModel)]="selectedPriority"
+                      (selectionChange)="applyFilters()"
+                      panelClass="employee-filter-panel">
+            <mat-option [value]="null">All Priorities</mat-option>
+            <mat-option *ngFor="let p of priorities" [value]="p">
+              <span class="priority-opt"
+                    [class.high]="p === 'HIGH'"
+                    [class.medium]="p === 'MEDIUM'"
+                    [class.low]="p === 'LOW'">
+                {{ p }}
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-icon matPrefix>info</mat-icon>
+          <mat-select [(ngModel)]="selectedStatus"
+                      (selectionChange)="applyFilters()"
+                      panelClass="employee-filter-panel">
+            <mat-option [value]="null">All Statuses</mat-option>
+            <mat-option *ngFor="let s of statuses" [value]="s">
+              {{ s }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Due Date</mat-label>
+          <mat-icon matPrefix>event</mat-icon>
+          <input matInput type="date"
+                 [(ngModel)]="selectedDueDate"
+                 (change)="applyFilters()"/>
+        </mat-form-field>
+
+      </div>
+
+      <div class="filter-results" *ngIf="activeFiltersCount > 0">
+        Showing <strong>{{ filteredTasks.length }}</strong>
+        of <strong>{{ tasks.length }}</strong> tasks
+      </div>
+
+    </mat-card-content>
+  </mat-card>
 
   <mat-card class="tasks-card">
     <mat-card-content style="padding:0">
@@ -270,7 +340,7 @@
       <div *ngIf="filteredTasks.length === 0 && activeTab === 'all'"
            class="empty-state">
         <mat-icon>assignment_late</mat-icon>
-        <p>No tasks found. Create your first task!</p>
+        <p>No tasks found matching your filters.</p>
       </div>
 
       <div *ngIf="overdueTasks.length === 0 && activeTab === 'overdue'"

@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../../services/task.service';
 import { AuthService } from '../../../services/auth.service';
 import { Task } from '../../../models/task.model';
+import { UI_MESSAGES } from '../../../constants/ui-messages';
 
 @Component({
   selector: 'app-employee-dashboard',
@@ -89,7 +90,11 @@ export class DashboardComponent implements OnInit {
       next: () => {
         task.status = newStatus;
         this.cdr.detectChanges();
-        this.snackBar.open('Status updated!', 'Close', { duration: 3000 });
+        this.snackBar.open(
+          UI_MESSAGES.employeeDashboard.statusUpdated,
+          UI_MESSAGES.common.closeAction,
+          { duration: 3000 }
+        );
       },
       error: (err) => {
         console.error('Error updating status:', err);

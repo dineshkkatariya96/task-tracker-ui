@@ -166,21 +166,11 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 
   .mat-mdc-form-field {
     margin-bottom: 0 !important;
-  }
-
-  .mdc-text-field--outlined {
-    height: 44px !important;
-  }
-
-  .mat-mdc-form-field-infix {
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-    min-height: 44px !important;
   }
 
   .mat-mdc-form-field-subscript-wrapper {
@@ -193,11 +183,6 @@
   gap: 8px;
 }
 
-.filter-field {
-  width: 220px;
-  margin-left: auto;
-}
-
 .create-btn {
   background: linear-gradient(135deg, #667eea, #764ba2) !important;
   color: white !important;
@@ -205,8 +190,96 @@
   padding: 0 20px !important;
   border-radius: 10px !important;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
-  margin-bottom: 0 !important;
-  flex-shrink: 0 !important;
+}
+
+.filter-card {
+  border-radius: 16px !important;
+  margin-bottom: 16px !important;
+  border: 1px solid rgba(102, 126, 234, 0.12) !important;
+
+  mat-card-content {
+    padding: 16px 20px !important;
+  }
+
+  .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+
+    .filter-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d5e;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: #667eea;
+      }
+
+      .filter-count {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 20px;
+      }
+    }
+
+    .clear-btn {
+      color: #f44336 !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .filter-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none !important;
+    }
+  }
+
+  .filter-results {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #888;
+
+    strong {
+      color: #667eea;
+      font-weight: 600;
+    }
+  }
+}
+
+.filter-field {
+  width: 100%;
+}
+
+.priority-opt {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.high { background: #ffebee; color: #c62828; }
+  &.medium { background: #fff8e1; color: #f57f17; }
+  &.low { background: #e8f5e9; color: #2e7d32; }
 }
 
 .tasks-card {

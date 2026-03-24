@@ -10,6 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { User } from '../../../models/user.model';
+import { UI_MESSAGES } from '../../../constants/ui-messages';
 
 @Component({
   selector: 'app-task-form',
@@ -64,19 +65,19 @@ export class TaskFormComponent implements OnInit {
 
   save() {
     if (!this.task.title) {
-      alert('Title is required!');
+      alert(UI_MESSAGES.taskForm.titleRequired);
       return;
     }
     if (!this.task.priority) {
-      alert('Priority is required!');
+      alert(UI_MESSAGES.taskForm.priorityRequired);
       return;
     }
     if (!this.task.dueDate) {
-      alert('Due date is required!');
+      alert(UI_MESSAGES.taskForm.dueDateRequired);
       return;
     }
     if (!this.task.assigneeId && !this.isEdit) {
-      alert('Please assign this task to an employee!');
+      alert(UI_MESSAGES.taskForm.assigneeRequired);
       return;
     }
 

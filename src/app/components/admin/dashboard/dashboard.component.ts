@@ -13,12 +13,16 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { TaskService } from '../../../services/task.service';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
 import { Task } from '../../../models/task.model';
 import { User } from '../../../models/user.model';
 import { TaskFormComponent } from '../task-form/task-form.component';
+import { UI_MESSAGES } from '../../../constants/ui-messages';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -37,6 +41,9 @@ import { TaskFormComponent } from '../task-form/task-form.component';
     MatFormFieldModule,
     MatInputModule,
     MatToolbarModule,
+    MatTooltipModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     TaskFormComponent
   ],
   templateUrl: './dashboard.component.html',
@@ -50,7 +57,14 @@ export class DashboardComponent implements OnInit {
   employees: User[] = [];
   displayedColumns = ['title', 'assignee', 'priority', 'status', 'dueDate', 'actions'];
   activeTab = 'all';
+
   selectedEmployeeId: number | null = null;
+  selectedPriority: string | null = null;
+  selectedStatus: string | null = null;
+  selectedDueDate: string | null = null;
+
+  priorities = ['HIGH', 'MEDIUM', 'LOW'];
+  statuses = ['OPEN', 'IN_PROGRESS', 'DONE', 'OVERDUE'];
 
   constructor(
     private taskService: TaskService,
@@ -77,7 +91,7 @@ export class DashboardComponent implements OnInit {
     this.taskService.getAllTasks().subscribe({
       next: (tasks) => {
         this.tasks = tasks;
-        this.filteredTasks = tasks;
+        this.applyFilters();
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -95,9 +109,7 @@ export class DashboardComponent implements OnInit {
         this.overdueTasks = tasks;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error loading overdue tasks:', err);
-      }
+      error: (err) => console.error('Error loading overdue tasks:', err)
     });
   }
 
@@ -107,34 +119,55 @@ export class DashboardComponent implements OnInit {
         this.employees = users;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error loading employees:', err);
-      }
+      error: (err) => console.error('Error loading employees:', err)
     });
   }
 
-filterByEmployee() {
-  console.log('Selected employee ID:', this.selectedEmployeeId);
-  console.log('All tasks:', this.tasks);
+  applyFilters() {
+    let result = [...this.tasks];
 
-  if (this.selectedEmployeeId === null) {
+    if (this.selectedEmployeeId !== null) {
+      const selectedEmployee = this.employees.find(
+        e => e.id === Number(this.selectedEmployeeId)
+      );
+      result = result.filter(
+        task => task.assigneeName === selectedEmployee?.name
+      );
+    }
+
+    if (this.selectedPriority !== null) {
+      result = result.filter(task => task.priority === this.selectedPriority);
+    }
+
+    if (this.selectedStatus !== null) {
+      result = result.filter(task => task.status === this.selectedStatus);
+    }
+
+    if (this.selectedDueDate !== null && this.selectedDueDate !== '') {
+      result = result.filter(task => task.dueDate === this.selectedDueDate);
+    }
+
+    this.filteredTasks = result;
+    this.cdr.detectChanges();
+  }
+
+  clearFilters() {
+    this.selectedEmployeeId = null;
+    this.selectedPriority = null;
+    this.selectedStatus = null;
+    this.selectedDueDate = null;
     this.filteredTasks = [...this.tasks];
-  } else {
-    const selectedEmployee = this.employees.find(
-      e => e.id === Number(this.selectedEmployeeId)
-    );
-    console.log('Selected employee:', selectedEmployee);
-
-    this.filteredTasks = this.tasks.filter(task => {
-      console.log('Task assigneeName:', task.assigneeName,
-                  'Employee name:', selectedEmployee?.name);
-      return task.assigneeName === selectedEmployee?.name;
-    });
+    this.cdr.detectChanges();
   }
 
-  console.log('Filtered tasks:', this.filteredTasks);
-  this.cdr.detectChanges();
-}
+  get activeFiltersCount(): number {
+    let count = 0;
+    if (this.selectedEmployeeId !== null) count++;
+    if (this.selectedPriority !== null) count++;
+    if (this.selectedStatus !== null) count++;
+    if (this.selectedDueDate !== null && this.selectedDueDate !== '') count++;
+    return count;
+  }
 
   openCreateTask() {
     const dialogRef = this.dialog.open(TaskFormComponent, {
@@ -147,15 +180,15 @@ filterByEmployee() {
         this.taskService.createTask(result).subscribe({
           next: () => {
             this.loadTasks();
-            this.snackBar.open('Task created successfully!', 'Close', {
+            this.snackBar.open(UI_MESSAGES.adminDashboard.createTaskSuccess, UI_MESSAGES.common.closeAction, {
               duration: 3000,
               panelClass: ['success-snackbar']
             });
           },
           error: (err) => {
             this.snackBar.open(
-              err.error?.error || 'Failed to create task!',
-              'Close',
+              err.error?.error || UI_MESSAGES.adminDashboard.createTaskError,
+              UI_MESSAGES.common.closeAction,
               { duration: 4000, panelClass: ['error-snackbar'] }
             );
           }
@@ -175,15 +208,15 @@ filterByEmployee() {
         this.taskService.updateTask(task.id, result).subscribe({
           next: () => {
             this.loadTasks();
-            this.snackBar.open('Task updated successfully!', 'Close', {
+            this.snackBar.open(UI_MESSAGES.adminDashboard.updateTaskSuccess, UI_MESSAGES.common.closeAction, {
               duration: 3000,
               panelClass: ['success-snackbar']
             });
           },
           error: (err) => {
             this.snackBar.open(
-              err.error?.error || 'Failed to update task!',
-              'Close',
+              err.error?.error || UI_MESSAGES.adminDashboard.updateTaskError,
+              UI_MESSAGES.common.closeAction,
               { duration: 4000, panelClass: ['error-snackbar'] }
             );
           }
@@ -192,25 +225,25 @@ filterByEmployee() {
     });
   }
 
-deleteTask(id: number) {
-  if (confirm('Are you sure you want to delete this task?')) {
-    this.taskService.deleteTask(id).subscribe({
-      next: () => {
-        this.loadTasks();
-        this.snackBar.open('Task deleted successfully!', 'Close', {
-          duration: 3000,
-          panelClass: ['success-snackbar']
-        });
-      },
-      error: () => {
-        this.snackBar.open('Failed to delete task!', 'Close', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
-        });
-      }
-    });
+  deleteTask(id: number) {
+    if (confirm(UI_MESSAGES.adminDashboard.deleteTaskConfirm)) {
+      this.taskService.deleteTask(id).subscribe({
+        next: () => {
+          this.loadTasks();
+          this.snackBar.open(UI_MESSAGES.adminDashboard.deleteTaskSuccess, UI_MESSAGES.common.closeAction, {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+        },
+        error: () => {
+          this.snackBar.open(UI_MESSAGES.adminDashboard.deleteTaskError, UI_MESSAGES.common.closeAction, {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
+    }
   }
-}
 
   getPriorityColor(priority: string): string {
     switch (priority) {
