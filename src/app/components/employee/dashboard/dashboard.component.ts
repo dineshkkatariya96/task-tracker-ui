@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,17 +9,20 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { interval, Subscription } from 'rxjs';
 import { TaskService } from '../../../services/task.service';
 import { AuthService } from '../../../services/auth.service';
 import { Task } from '../../../models/task.model';
-import { UI_MESSAGES } from '../../../constants/ui-messages';
+import { MESSAGES, TASK_STATUSES } from '../../../constants/app.constants';
 
 @Component({
   selector: 'app-employee-dashboard',
   standalone: true,
   imports: [
     CommonModule,
+    DatePipe,
     FormsModule,
     MatCardModule,
     MatButtonModule,
@@ -28,17 +31,20 @@ import { UI_MESSAGES } from '../../../constants/ui-messages';
     MatToolbarModule,
     MatSelectModule,
     MatFormFieldModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTooltipModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   myTasks: Task[] = [];
   overdueTasks: Task[] = [];
   activeTab = 'my';
-  statuses = ['OPEN', 'IN_PROGRESS', 'DONE'];
+  statuses = TASK_STATUSES.filter(s => s !== 'OVERDUE');
+  private refreshSubscription!: Subscription;
+  lastRefreshed: Date = new Date();
 
   constructor(
     private taskService: TaskService,
@@ -56,6 +62,18 @@ export class DashboardComponent implements OnInit {
     }
     this.loadMyTasks();
     this.loadOverdueTasks();
+
+    this.refreshSubscription = interval(10000).subscribe(() => {
+      this.loadMyTasks();
+      this.loadOverdueTasks();
+      this.lastRefreshed = new Date();
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
   }
 
   loadMyTasks() {
@@ -80,7 +98,7 @@ export class DashboardComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error loading overdue tasks:', err);
+        console.error('Error loading overdue tasks:', err)
       }
     });
   }
@@ -90,14 +108,16 @@ export class DashboardComponent implements OnInit {
       next: () => {
         task.status = newStatus;
         this.cdr.detectChanges();
-        this.snackBar.open(
-          UI_MESSAGES.employeeDashboard.statusUpdated,
-          UI_MESSAGES.common.closeAction,
-          { duration: 3000 }
-        );
+        this.snackBar.open(MESSAGES.TASK.STATUS_UPDATED, 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
       },
-      error: (err) => {
-        console.error('Error updating status:', err);
+      error: () => {
+        this.snackBar.open(MESSAGES.TASK.STATUS_UPDATE_FAILED, 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }
@@ -123,10 +143,6 @@ export class DashboardComponent implements OnInit {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
-  }
-
-  get currentTasks(): Task[] {
-    return this.activeTab === 'overdue' ? this.overdueTasks : this.myTasks;
   }
 
   get completedTasksCount(): number {

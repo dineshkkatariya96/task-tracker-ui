@@ -84,6 +84,12 @@
     </button>
   </div>
 
+  <div class="refresh-indicator">
+    <mat-icon>sync</mat-icon>
+    Auto-refreshing every 10 seconds
+    <span class="refresh-time">Last updated: {{ lastRefreshed | date:'hh:mm:ss a' }}</span>
+  </div>
+
   <mat-card class="filter-card" *ngIf="activeTab === 'all'">
     <mat-card-content>
       <div class="filter-header">

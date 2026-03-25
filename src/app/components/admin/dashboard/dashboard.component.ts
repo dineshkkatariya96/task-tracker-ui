@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -16,6 +16,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { interval, Subscription } from 'rxjs';
 import { TaskService } from '../../../services/task.service';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
@@ -29,6 +30,7 @@ import { UI_MESSAGES } from '../../../constants/ui-messages';
   standalone: true,
   imports: [
     CommonModule,
+    DatePipe,
     FormsModule,
     MatCardModule,
     MatButtonModule,
@@ -49,7 +51,7 @@ import { UI_MESSAGES } from '../../../constants/ui-messages';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
@@ -57,6 +59,7 @@ export class DashboardComponent implements OnInit {
   employees: User[] = [];
   displayedColumns = ['title', 'assignee', 'priority', 'status', 'dueDate', 'actions'];
   activeTab = 'all';
+  lastRefreshed: Date = new Date();
 
   selectedEmployeeId: number | null = null;
   selectedPriority: string | null = null;
@@ -65,6 +68,8 @@ export class DashboardComponent implements OnInit {
 
   priorities = ['HIGH', 'MEDIUM', 'LOW'];
   statuses = ['OPEN', 'IN_PROGRESS', 'DONE', 'OVERDUE'];
+
+  private refreshSubscription!: Subscription;
 
   constructor(
     private taskService: TaskService,
@@ -85,6 +90,19 @@ export class DashboardComponent implements OnInit {
     this.loadTasks();
     this.loadEmployees();
     this.loadOverdueTasks();
+
+    this.refreshSubscription = interval(10000).subscribe(() => {
+      this.loadTasks();
+      this.loadOverdueTasks();
+      this.lastRefreshed = new Date();
+      this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
   }
 
   loadTasks() {
@@ -180,10 +198,11 @@ export class DashboardComponent implements OnInit {
         this.taskService.createTask(result).subscribe({
           next: () => {
             this.loadTasks();
-            this.snackBar.open(UI_MESSAGES.adminDashboard.createTaskSuccess, UI_MESSAGES.common.closeAction, {
-              duration: 3000,
-              panelClass: ['success-snackbar']
-            });
+            this.snackBar.open(
+              UI_MESSAGES.adminDashboard.createTaskSuccess,
+              UI_MESSAGES.common.closeAction,
+              { duration: 3000, panelClass: ['success-snackbar'] }
+            );
           },
           error: (err) => {
             this.snackBar.open(
@@ -208,10 +227,11 @@ export class DashboardComponent implements OnInit {
         this.taskService.updateTask(task.id, result).subscribe({
           next: () => {
             this.loadTasks();
-            this.snackBar.open(UI_MESSAGES.adminDashboard.updateTaskSuccess, UI_MESSAGES.common.closeAction, {
-              duration: 3000,
-              panelClass: ['success-snackbar']
-            });
+            this.snackBar.open(
+              UI_MESSAGES.adminDashboard.updateTaskSuccess,
+              UI_MESSAGES.common.closeAction,
+              { duration: 3000, panelClass: ['success-snackbar'] }
+            );
           },
           error: (err) => {
             this.snackBar.open(
@@ -230,16 +250,18 @@ export class DashboardComponent implements OnInit {
       this.taskService.deleteTask(id).subscribe({
         next: () => {
           this.loadTasks();
-          this.snackBar.open(UI_MESSAGES.adminDashboard.deleteTaskSuccess, UI_MESSAGES.common.closeAction, {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
+          this.snackBar.open(
+            UI_MESSAGES.adminDashboard.deleteTaskSuccess,
+            UI_MESSAGES.common.closeAction,
+            { duration: 3000, panelClass: ['success-snackbar'] }
+          );
         },
         error: () => {
-          this.snackBar.open(UI_MESSAGES.adminDashboard.deleteTaskError, UI_MESSAGES.common.closeAction, {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          });
+          this.snackBar.open(
+            UI_MESSAGES.adminDashboard.deleteTaskError,
+            UI_MESSAGES.common.closeAction,
+            { duration: 3000, panelClass: ['error-snackbar'] }
+          );
         }
       });
     }
