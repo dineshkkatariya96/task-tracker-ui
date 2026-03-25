@@ -20,6 +20,14 @@ export const UI_MESSAGES = {
   employeeDashboard: {
     statusUpdated: 'Status updated!'
   },
+  taskHistory: {
+    title: 'Task History',
+    viewTooltip: 'View task history',
+    loading: 'Loading task history...',
+    empty: 'No history available for this task yet.',
+    loadError: 'Failed to load task history.',
+    unknownValue: '-'
+  },
   login: {
     credentialsRequired: 'Please enter email and password!',
     invalidCredentials: 'Invalid email or password!'

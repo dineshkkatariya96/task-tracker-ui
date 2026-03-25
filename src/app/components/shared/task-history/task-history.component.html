@@ -1,0 +1,51 @@
+<mat-card class="history-card">
+  <mat-card-content>
+    <div class="history-header">
+      <div>
+        <h2 class="history-title">{{ messages.title }}</h2>
+        <p class="history-subtitle" *ngIf="resolvedTaskId !== null">
+          Task #{{ resolvedTaskId }}
+        </p>
+      </div>
+      <button
+        *ngIf="dialogRef"
+        mat-icon-button
+        [mat-dialog-close]="true"
+        [attr.aria-label]="UI_MESSAGES.common.closeAction">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="history-state" *ngIf="loading">
+      <mat-spinner diameter="32"></mat-spinner>
+      <p>{{ messages.loading }}</p>
+    </div>
+
+    <div class="history-state error" *ngIf="!loading && errorMessage">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div class="history-state empty" *ngIf="!loading && !errorMessage && history.length === 0">
+      <mat-icon>history</mat-icon>
+      <p>{{ messages.empty }}</p>
+    </div>
+
+    <mat-list *ngIf="!loading && !errorMessage && history.length > 0">
+      <mat-list-item *ngFor="let entry of history">
+        <mat-icon matListItemIcon>history_toggle_off</mat-icon>
+        <div matListItemTitle class="history-action">{{ entry.action }}</div>
+        <div matListItemLine class="history-change">
+          {{ formatValue(entry.oldValue) }} -> {{ formatValue(entry.newValue) }}
+        </div>
+        <div matListItemLine class="history-meta">
+          {{ entry.performedBy || messages.unknownValue }} • {{ entry.timestamp | date:'medium' }}
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+
+  <mat-card-actions align="end" *ngIf="dialogRef">
+    <button mat-button [mat-dialog-close]="true">{{ UI_MESSAGES.common.closeAction }}</button>
+  </mat-card-actions>
+</mat-card>

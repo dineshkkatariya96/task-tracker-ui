@@ -91,7 +91,13 @@
       <mat-card-content>
         <div class="task-header">
           <div>
-            <div class="task-title">{{ task.title }}</div>
+            <button
+              mat-button
+              type="button"
+              class="task-history-trigger"
+              (click)="openTaskHistory(task)">
+              {{ task.title }}
+            </button>
             <div class="task-date">
               <mat-icon style="font-size:14px;width:14px;height:14px">
                 event
@@ -136,7 +142,13 @@
       <mat-card-content>
         <div class="task-header">
           <div>
-            <div class="task-title">{{ task.title }}</div>
+            <button
+              mat-button
+              type="button"
+              class="task-history-trigger"
+              (click)="openTaskHistory(task)">
+              {{ task.title }}
+            </button>
             <div class="task-date" style="color:#f44336">
               <mat-icon style="font-size:14px;width:14px;
                                height:14px;color:#f44336">

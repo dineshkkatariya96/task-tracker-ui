@@ -263,6 +263,23 @@
   .status-select { width: 100%; }
 }
 
+.task-history-trigger {
+  min-width: 0 !important;
+  padding: 6px 12px !important;
+  justify-content: flex-start !important;
+  color: #2d2d5e !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  background: linear-gradient(135deg, #eef2ff, #f6f3ff) !important;
+  border: 1px solid rgba(102, 126, 234, 0.18) !important;
+  border-radius: 999px !important;
+
+  &:hover {
+    background: linear-gradient(135deg, #e4ebff, #efe7ff) !important;
+  }
+}
+
 .empty-state {
   text-align: center;
   padding: 60px;

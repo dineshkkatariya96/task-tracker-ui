@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Task, TaskRequest } from '../models/task.model';
+import { TaskHistoryEntry } from '../models/task-history.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,10 @@ export class TaskService {
 
   getOverdueTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(`${this.apiUrl}/overdue`);
+  }
+
+  getTaskHistory(id: number): Observable<TaskHistoryEntry[]> {
+    return this.http.get<TaskHistoryEntry[]>(`${this.apiUrl}/${id}/history`);
   }
 
   createTask(task: TaskRequest): Observable<Task> {

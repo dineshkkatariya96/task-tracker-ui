@@ -23,6 +23,7 @@ import { AuthService } from '../../../services/auth.service';
 import { Task } from '../../../models/task.model';
 import { User } from '../../../models/user.model';
 import { TaskFormComponent } from '../task-form/task-form.component';
+import { TaskHistoryComponent } from '../../shared/task-history/task-history.component';
 import { UI_MESSAGES } from '../../../constants/ui-messages';
 
 @Component({
@@ -52,6 +53,7 @@ import { UI_MESSAGES } from '../../../constants/ui-messages';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  readonly UI_MESSAGES = UI_MESSAGES;
 
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
@@ -265,6 +267,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  openTaskHistory(task: Task) {
+    this.dialog.open(TaskHistoryComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      data: { taskId: task.id }
+    });
   }
 
   getPriorityColor(priority: string): string {

@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +16,8 @@ import { interval, Subscription } from 'rxjs';
 import { TaskService } from '../../../services/task.service';
 import { AuthService } from '../../../services/auth.service';
 import { Task } from '../../../models/task.model';
+import { TaskHistoryComponent } from '../../shared/task-history/task-history.component';
+import { UI_MESSAGES } from '../../../constants/ui-messages';
 import { MESSAGES, TASK_STATUSES } from '../../../constants/app.constants';
 
 @Component({
@@ -28,6 +31,7 @@ import { MESSAGES, TASK_STATUSES } from '../../../constants/app.constants';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
+    MatDialogModule,
     MatToolbarModule,
     MatSelectModule,
     MatFormFieldModule,
@@ -38,6 +42,7 @@ import { MESSAGES, TASK_STATUSES } from '../../../constants/app.constants';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  readonly UI_MESSAGES = UI_MESSAGES;
 
   myTasks: Task[] = [];
   overdueTasks: Task[] = [];
@@ -49,6 +54,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
+    private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router,
     private cdr: ChangeDetectorRef
@@ -119,6 +125,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
           panelClass: ['error-snackbar']
         });
       }
+    });
+  }
+
+  openTaskHistory(task: Task) {
+    this.dialog.open(TaskHistoryComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      data: { taskId: task.id }
     });
   }
 

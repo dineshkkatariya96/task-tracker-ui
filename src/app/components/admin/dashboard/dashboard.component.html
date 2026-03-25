@@ -181,7 +181,13 @@
         <ng-container matColumnDef="title">
           <th mat-header-cell *matHeaderCellDef>Title</th>
           <td mat-cell *matCellDef="let task">
-            <strong>{{ task.title }}</strong>
+            <button
+              mat-button
+              type="button"
+              class="task-history-trigger"
+              (click)="openTaskHistory(task)">
+              <strong>{{ task.title }}</strong>
+            </button>
             <div style="font-size:12px;color:#999;margin-top:2px">
               {{ task.description }}
             </div>
@@ -243,16 +249,18 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let task">
-            <button mat-icon-button color="primary"
-                    (click)="openEditTask(task)"
-                    matTooltip="Edit task">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn"
-                    (click)="deleteTask(task.id)"
-                    matTooltip="Delete task">
-              <mat-icon>delete</mat-icon>
-            </button>
+            <div class="action-buttons">
+              <button mat-icon-button color="primary"
+                      class="action-icon-btn edit-action-btn"
+                      (click)="openEditTask(task)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn"
+                      class="action-icon-btn delete-action-btn"
+                      (click)="deleteTask(task.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </td>
         </ng-container>
 
@@ -270,7 +278,13 @@
         <ng-container matColumnDef="title">
           <th mat-header-cell *matHeaderCellDef>Title</th>
           <td mat-cell *matCellDef="let task">
-            <strong>{{ task.title }}</strong>
+            <button
+              mat-button
+              type="button"
+              class="task-history-trigger"
+              (click)="openTaskHistory(task)">
+              <strong>{{ task.title }}</strong>
+            </button>
           </td>
         </ng-container>
 
@@ -326,16 +340,18 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let task">
-            <button mat-icon-button color="primary"
-                    (click)="openEditTask(task)"
-                    matTooltip="Edit task">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn"
-                    (click)="deleteTask(task.id)"
-                    matTooltip="Delete task">
-              <mat-icon>delete</mat-icon>
-            </button>
+            <div class="action-buttons">
+              <button mat-icon-button color="primary"
+                      class="action-icon-btn edit-action-btn"
+                      (click)="openEditTask(task)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn"
+                      class="action-icon-btn delete-action-btn"
+                      (click)="deleteTask(task.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </td>
         </ng-container>
 

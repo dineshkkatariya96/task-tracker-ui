@@ -290,6 +290,47 @@
 
 .full-width { width: 100%; }
 
+.task-history-trigger {
+  min-width: 0 !important;
+  padding: 6px 12px !important;
+  justify-content: flex-start !important;
+  color: #2d2d5e !important;
+  font: inherit !important;
+  line-height: 1.2 !important;
+  background: linear-gradient(135deg, #eef2ff, #f6f3ff) !important;
+  border: 1px solid rgba(102, 126, 234, 0.18) !important;
+  border-radius: 999px !important;
+
+  &:hover {
+    background: linear-gradient(135deg, #e4ebff, #efe7ff) !important;
+  }
+
+  strong {
+    text-align: left;
+  }
+}
+
+.action-icon-btn {
+  border-radius: 12px !important;
+  flex-shrink: 0;
+}
+
+.edit-action-btn {
+  background: rgba(33, 150, 243, 0.12) !important;
+
+  &:hover {
+    background: rgba(33, 150, 243, 0.2) !important;
+  }
+}
+
+.delete-action-btn {
+  background: rgba(244, 67, 54, 0.12) !important;
+
+  &:hover {
+    background: rgba(244, 67, 54, 0.2) !important;
+  }
+}
+
 .priority-chip {
   padding: 4px 12px;
   border-radius: 20px;
@@ -334,8 +375,16 @@
 }
 
 .mat-column-actions {
-  width: 100px;
+  width: 128px;
   text-align: right;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 112px;
 }
 
 .refresh-indicator {
