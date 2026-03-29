@@ -19,7 +19,10 @@
       </div>
     </div>
     <button mat-icon-button class="logout-btn"
-            (click)="logout()" matTooltip="Logout">
+            (click)="logout()"
+            matTooltip="Sign out securely"
+            matTooltipPosition="below"
+            matTooltipClass="logout-tooltip">
       <mat-icon>logout</mat-icon>
     </button>
   </div>
@@ -74,13 +77,13 @@
   <div class="tab-row">
     <button mat-raised-button
             [color]="activeTab === 'my' ? 'primary' : ''"
-            (click)="activeTab = 'my'; loadMyTasks()">
+            (click)="showMyTasksTab()">
       <mat-icon>assignment_ind</mat-icon>
       My Tasks ({{ myTasks.length }})
     </button>
     <button mat-raised-button
             [color]="activeTab === 'overdue' ? 'warn' : ''"
-            (click)="activeTab = 'overdue'; loadOverdueTasks()">
+            (click)="showOverdueTasksTab()">
       <mat-icon>schedule</mat-icon>
       Overdue ({{ overdueTasks.length }})
     </button>

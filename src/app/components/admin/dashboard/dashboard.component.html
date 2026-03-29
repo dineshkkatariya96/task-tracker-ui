@@ -14,7 +14,10 @@
       Admin
     </div>
     <button mat-icon-button class="logout-btn"
-            (click)="logout()" matTooltip="Logout">
+            (click)="logout()"
+            matTooltip="Sign out securely"
+            matTooltipPosition="below"
+            matTooltipClass="logout-tooltip">
       <mat-icon>logout</mat-icon>
     </button>
   </div>
@@ -64,13 +67,13 @@
     <div class="tab-buttons">
       <button mat-raised-button
               [color]="activeTab === 'all' ? 'primary' : ''"
-              (click)="activeTab = 'all'; loadTasks()">
+              (click)="showAllTasksTab()">
         <mat-icon>list</mat-icon>
         All Tasks ({{ tasks.length }})
       </button>
       <button mat-raised-button
               [color]="activeTab === 'overdue' ? 'warn' : ''"
-              (click)="activeTab = 'overdue'; loadOverdueTasks()">
+              (click)="showOverdueTasksTab()">
         <mat-icon>schedule</mat-icon>
         Overdue ({{ overdueTasks.length }})
       </button>
@@ -114,7 +117,7 @@
           <mat-label>Employee</mat-label>
           <mat-icon matPrefix>person_search</mat-icon>
           <mat-select [(ngModel)]="selectedEmployeeId"
-                      (selectionChange)="applyFilters()"
+                      (selectionChange)="onFiltersChanged()"
                       panelClass="employee-filter-panel">
             <mat-option [value]="null">All Employees</mat-option>
             <mat-option *ngFor="let emp of employees" [value]="emp.id">
@@ -127,7 +130,7 @@
           <mat-label>Priority</mat-label>
           <mat-icon matPrefix>flag</mat-icon>
           <mat-select [(ngModel)]="selectedPriority"
-                      (selectionChange)="applyFilters()"
+                      (selectionChange)="onFiltersChanged()"
                       panelClass="employee-filter-panel">
             <mat-option [value]="null">All Priorities</mat-option>
             <mat-option *ngFor="let p of priorities" [value]="p">
@@ -145,7 +148,7 @@
           <mat-label>Status</mat-label>
           <mat-icon matPrefix>info</mat-icon>
           <mat-select [(ngModel)]="selectedStatus"
-                      (selectionChange)="applyFilters()"
+                      (selectionChange)="onFiltersChanged()"
                       panelClass="employee-filter-panel">
             <mat-option [value]="null">All Statuses</mat-option>
             <mat-option *ngFor="let s of statuses" [value]="s">
@@ -159,7 +162,7 @@
           <mat-icon matPrefix>event</mat-icon>
           <input matInput type="date"
                  [(ngModel)]="selectedDueDate"
-                 (change)="applyFilters()"/>
+                 (change)="onFiltersChanged()"/>
         </mat-form-field>
 
       </div>

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Task, TaskRequest } from '../models/task.model';
 import { TaskHistoryEntry } from '../models/task-history.model';
+import { LOG_SUCCESSFUL_READ_REQUEST } from '../interceptors/activity-log.tokens';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,12 @@ export class TaskService {
   }
 
   getTaskHistory(id: number): Observable<TaskHistoryEntry[]> {
-    return this.http.get<TaskHistoryEntry[]>(`${this.apiUrl}/${id}/history`);
+    return this.http.get<TaskHistoryEntry[]>(
+      `${this.apiUrl}/${id}/history`,
+      {
+        context: new HttpContext().set(LOG_SUCCESSFUL_READ_REQUEST, true)
+      }
+    );
   }
 
   createTask(task: TaskRequest): Observable<Task> {

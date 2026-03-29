@@ -34,6 +34,9 @@ yarn-error.log
 .sass-cache/
 /connect.lock
 /coverage
+# Keep the folder, ignore all generated runtime logs.
+/logs/**
+!/logs/.gitkeep
 /libpeerconnection.log
 testem.log
 /typings

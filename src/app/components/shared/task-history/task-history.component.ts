@@ -10,6 +10,7 @@ import { finalize } from 'rxjs';
 import { TaskHistoryEntry } from '../../../models/task-history.model';
 import { TaskService } from '../../../services/task.service';
 import { UI_MESSAGES } from '../../../constants/ui-messages';
+import { ActivityLogService } from '../../../services/activity-log.service';
 
 interface TaskHistoryDialogData {
   taskId: number;
@@ -43,6 +44,7 @@ export class TaskHistoryComponent implements OnInit, OnChanges {
 
   constructor(
     private taskService: TaskService,
+    private activityLogService: ActivityLogService,
     private cdr: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private data: TaskHistoryDialogData | null,
     @Optional() public dialogRef: MatDialogRef<TaskHistoryComponent> | null
@@ -125,6 +127,10 @@ export class TaskHistoryComponent implements OnInit, OnChanges {
     this.resolvedTaskId = taskId;
 
     if (taskId === null) {
+      this.activityLogService.log('task', 'Task history requested without task id', {
+        level: 'error',
+        status: 'failure'
+      });
       this.history = [];
       this.loading = false;
       this.errorMessage = this.messages.loadError;
@@ -132,6 +138,12 @@ export class TaskHistoryComponent implements OnInit, OnChanges {
       return;
     }
 
+    this.activityLogService.log('task', 'Task history loading started', {
+      status: 'started',
+      details: {
+        taskId
+      }
+    });
     this.loading = true;
     this.errorMessage = '';
     this.history = [];
@@ -146,10 +158,24 @@ export class TaskHistoryComponent implements OnInit, OnChanges {
       .subscribe({
       next: (history) => {
         this.history = this.normalizeHistory(history);
+        this.activityLogService.log('task', 'Task history loaded', {
+          status: 'success',
+          details: {
+            taskId,
+            entryCount: this.history.length
+          }
+        });
       },
       error: () => {
         this.history = [];
         this.errorMessage = this.messages.loadError;
+        this.activityLogService.log('task', 'Task history load failed', {
+          level: 'error',
+          status: 'failure',
+          details: {
+            taskId
+          }
+        });
       }
     });
   }

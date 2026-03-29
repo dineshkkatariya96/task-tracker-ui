@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { LoginRequest, LoginResponse, RegisterRequest } from '../models/user.model';
+import { ActivityLogService } from './activity-log.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,10 @@ export class AuthService {
 
   private headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private activityLogService: ActivityLogService
+  ) {}
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(
@@ -24,6 +28,13 @@ export class AuthService {
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
+        this.activityLogService.log('auth', 'Login completed', {
+          status: 'success',
+          details: {
+            email: response.email,
+            role: response.role
+          }
+        });
       })
     );
   }
@@ -37,6 +48,13 @@ export class AuthService {
   }
 
   logout(): void {
+    this.activityLogService.log('auth', 'User logged out', {
+      status: 'success',
+      details: {
+        email: localStorage.getItem('email'),
+        role: localStorage.getItem('role')
+      }
+    });
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('email');

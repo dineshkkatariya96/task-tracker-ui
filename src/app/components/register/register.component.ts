@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
+import { ActivityLogService } from '../../services/activity-log.service';
 import { UI_MESSAGES } from '../../constants/ui-messages';
 
 @Component({
@@ -38,6 +39,7 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
+    private activityLogService: ActivityLogService,
     private router: Router,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef
@@ -45,22 +47,53 @@ export class RegisterComponent {
 
   register() {
     if (!this.name || !this.email || !this.password) {
+      this.activityLogService.log('auth', 'Registration validation failed', {
+        level: 'warn',
+        status: 'failure',
+        details: {
+          email: this.email,
+          reason: 'Missing required fields'
+        }
+      });
       this.snackBar.open(UI_MESSAGES.register.allFieldsRequired, UI_MESSAGES.common.closeAction, { duration: 3000 });
       return;
     }
 
     if (this.password !== this.confirmPassword) {
+      this.activityLogService.log('auth', 'Registration validation failed', {
+        level: 'warn',
+        status: 'failure',
+        details: {
+          email: this.email,
+          reason: 'Passwords do not match'
+        }
+      });
       this.snackBar.open(UI_MESSAGES.register.passwordsDoNotMatch, UI_MESSAGES.common.closeAction, { duration: 3000 });
       return;
     }
 
     if (this.password.length < 6) {
+      this.activityLogService.log('auth', 'Registration validation failed', {
+        level: 'warn',
+        status: 'failure',
+        details: {
+          email: this.email,
+          reason: 'Password too short'
+        }
+      });
       this.snackBar.open(UI_MESSAGES.register.passwordTooShort, UI_MESSAGES.common.closeAction, { duration: 3000 });
       return;
     }
 
     this.loading = true;
     this.cdr.detectChanges();
+    this.activityLogService.log('auth', 'Registration submitted', {
+      status: 'started',
+      details: {
+        email: this.email,
+        name: this.name
+      }
+    });
 
     this.authService.register({
       name: this.name,
@@ -70,6 +103,12 @@ export class RegisterComponent {
       next: () => {
         this.loading = false;
         this.cdr.detectChanges();
+        this.activityLogService.log('auth', 'Registration completed', {
+          status: 'success',
+          details: {
+            email: this.email
+          }
+        });
         this.snackBar.open(UI_MESSAGES.register.registrationSuccess, UI_MESSAGES.common.closeAction, {
           duration: 3000
         });
@@ -78,6 +117,15 @@ export class RegisterComponent {
       error: (err) => {
         this.loading = false;
         this.cdr.detectChanges();
+        this.activityLogService.log('auth', 'Registration failed', {
+          level: 'error',
+          status: 'failure',
+          details: {
+            email: this.email,
+            responseStatus: err.status,
+            errorMessage: err.error
+          }
+        });
         this.snackBar.open(
           err.error || UI_MESSAGES.register.registrationError,
           UI_MESSAGES.common.closeAction,
@@ -88,6 +136,9 @@ export class RegisterComponent {
   }
 
   goToLogin() {
+    this.activityLogService.log('auth', 'Login screen requested', {
+      status: 'success'
+    });
     this.router.navigate(['/login']);
   }
 }

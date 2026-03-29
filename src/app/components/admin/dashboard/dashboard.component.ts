@@ -22,9 +22,10 @@ import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
 import { Task } from '../../../models/task.model';
 import { User } from '../../../models/user.model';
-import { TaskFormComponent } from '../task-form/task-form.component';
 import { TaskHistoryComponent } from '../../shared/task-history/task-history.component';
 import { UI_MESSAGES } from '../../../constants/ui-messages';
+import { ActivityLogService } from '../../../services/activity-log.service';
+import { TaskFormComponent } from '../task-form/task-form.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -46,8 +47,7 @@ import { UI_MESSAGES } from '../../../constants/ui-messages';
     MatToolbarModule,
     MatTooltipModule,
     MatDatepickerModule,
-    MatNativeDateModule,
-    TaskFormComponent
+    MatNativeDateModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -77,6 +77,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private taskService: TaskService,
     private userService: UserService,
     private authService: AuthService,
+    private activityLogService: ActivityLogService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router,
@@ -89,6 +90,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
+
+    this.activityLogService.log('task', 'Admin dashboard loaded', {
+      status: 'success'
+    });
+
     this.loadTasks();
     this.loadEmployees();
     this.loadOverdueTasks();
@@ -171,12 +177,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  onFiltersChanged() {
+    this.applyFilters();
+    this.activityLogService.log('task', 'Admin task filters updated', {
+      status: 'success',
+      details: {
+        employeeId: this.selectedEmployeeId,
+        priority: this.selectedPriority,
+        statusFilter: this.selectedStatus,
+        dueDate: this.selectedDueDate,
+        resultCount: this.filteredTasks.length
+      }
+    });
+  }
+
   clearFilters() {
     this.selectedEmployeeId = null;
     this.selectedPriority = null;
     this.selectedStatus = null;
     this.selectedDueDate = null;
     this.filteredTasks = [...this.tasks];
+    this.activityLogService.log('task', 'Admin task filters cleared', {
+      status: 'success'
+    });
     this.cdr.detectChanges();
   }
 
@@ -190,6 +213,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   openCreateTask() {
+    this.activityLogService.log('task', 'Create task dialog opened', {
+      status: 'success'
+    });
+
     const dialogRef = this.dialog.open(TaskFormComponent, {
       width: '500px',
       data: { employees: this.employees }
@@ -197,6 +224,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.activityLogService.log('task', 'Create task submitted', {
+          status: 'started',
+          details: result
+        });
         this.taskService.createTask(result).subscribe({
           next: () => {
             this.loadTasks();
@@ -214,11 +245,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
             );
           }
         });
+        return;
       }
+
+      this.activityLogService.log('task', 'Create task dialog closed without saving', {
+        level: 'warn',
+        status: 'failure'
+      });
     });
   }
 
   openEditTask(task: Task) {
+    this.activityLogService.log('task', 'Edit task dialog opened', {
+      status: 'success',
+      details: {
+        taskId: task.id,
+        priority: task.priority,
+        statusValue: task.status,
+        dueDate: task.dueDate
+      }
+    });
+
     const dialogRef = this.dialog.open(TaskFormComponent, {
       width: '500px',
       data: { task, employees: this.employees }
@@ -226,6 +273,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.activityLogService.log('task', 'Edit task submitted', {
+          status: 'started',
+          details: {
+            taskId: task.id,
+            ...result
+          }
+        });
         this.taskService.updateTask(task.id, result).subscribe({
           next: () => {
             this.loadTasks();
@@ -243,12 +297,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
             );
           }
         });
+        return;
       }
+
+      this.activityLogService.log('task', 'Edit task dialog closed without saving', {
+        level: 'warn',
+        status: 'failure',
+        details: {
+          taskId: task.id
+        }
+      });
     });
   }
 
   deleteTask(id: number) {
     if (confirm(UI_MESSAGES.adminDashboard.deleteTaskConfirm)) {
+      this.activityLogService.log('task', 'Task deletion confirmed', {
+        status: 'started',
+        details: {
+          taskId: id
+        }
+      });
       this.taskService.deleteTask(id).subscribe({
         next: () => {
           this.loadTasks();
@@ -266,10 +335,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
           );
         }
       });
+      return;
     }
+
+    this.activityLogService.log('task', 'Task deletion cancelled', {
+      level: 'warn',
+      status: 'failure',
+      details: {
+        taskId: id
+      }
+    });
   }
 
   openTaskHistory(task: Task) {
+    this.activityLogService.log('task', 'Task history opened', {
+      status: 'success',
+      details: {
+        taskId: task.id,
+        statusValue: task.status
+      }
+    });
+
     this.dialog.open(TaskHistoryComponent, {
       width: '720px',
       maxWidth: '95vw',
@@ -298,6 +384,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  showAllTasksTab() {
+    this.activeTab = 'all';
+    this.activityLogService.log('task', 'Admin switched to all tasks tab', {
+      status: 'success'
+    });
+    this.loadTasks();
+  }
+
+  showOverdueTasksTab() {
+    this.activeTab = 'overdue';
+    this.activityLogService.log('task', 'Admin switched to overdue tasks tab', {
+      status: 'success'
+    });
+    this.loadOverdueTasks();
   }
 
   get currentTasks(): Task[] {
