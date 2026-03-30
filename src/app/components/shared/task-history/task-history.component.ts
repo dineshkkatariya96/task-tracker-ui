@@ -156,27 +156,16 @@ export class TaskHistoryComponent implements OnInit, OnChanges {
         })
       )
       .subscribe({
-      next: (history) => {
-        this.history = this.normalizeHistory(history);
-        this.activityLogService.log('task', 'Task history loaded', {
-          status: 'success',
-          details: {
-            taskId,
-            entryCount: this.history.length
-          }
-        });
-      },
-      error: () => {
-        this.history = [];
-        this.errorMessage = this.messages.loadError;
-        this.activityLogService.log('task', 'Task history load failed', {
-          level: 'error',
-          status: 'failure',
-          details: {
-            taskId
-          }
-        });
-      }
-    });
+        next: (history) => {
+          this.history = this.normalizeHistory(history);
+          this.activityLogService.log('task', 'Task history loaded', {
+            status: 'success',
+            details: {
+              taskId,
+              entryCount: this.history.length
+            }
+          });
+        }
+      });
   }
 }

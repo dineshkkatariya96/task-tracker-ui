@@ -114,38 +114,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadTasks() {
-    this.taskService.getAllTasks().subscribe({
-      next: (tasks) => {
-        this.tasks = tasks;
-        this.applyFilters();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error loading tasks:', err);
-        if (err.status === 401) {
-          this.router.navigate(['/login']);
-        }
-      }
+    this.taskService.getAllTasks().subscribe((tasks) => {
+      this.tasks = tasks;
+      this.applyFilters();
+      this.cdr.detectChanges();
     });
   }
 
   loadOverdueTasks() {
-    this.taskService.getOverdueTasks().subscribe({
-      next: (tasks) => {
-        this.overdueTasks = tasks;
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error('Error loading overdue tasks:', err)
+    this.taskService.getOverdueTasks().subscribe((tasks) => {
+      this.overdueTasks = tasks;
+      this.cdr.detectChanges();
     });
   }
 
   loadEmployees() {
-    this.userService.getEmployeesOnly().subscribe({
-      next: (users) => {
-        this.employees = users;
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error('Error loading employees:', err)
+    this.userService.getEmployeesOnly().subscribe((users) => {
+      this.employees = users;
+      this.cdr.detectChanges();
     });
   }
 
@@ -236,13 +222,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               UI_MESSAGES.common.closeAction,
               { duration: 3000, panelClass: ['success-snackbar'] }
             );
-          },
-          error: (err) => {
-            this.snackBar.open(
-              err.error?.error || UI_MESSAGES.adminDashboard.createTaskError,
-              UI_MESSAGES.common.closeAction,
-              { duration: 4000, panelClass: ['error-snackbar'] }
-            );
           }
         });
         return;
@@ -288,13 +267,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               UI_MESSAGES.common.closeAction,
               { duration: 3000, panelClass: ['success-snackbar'] }
             );
-          },
-          error: (err) => {
-            this.snackBar.open(
-              err.error?.error || UI_MESSAGES.adminDashboard.updateTaskError,
-              UI_MESSAGES.common.closeAction,
-              { duration: 4000, panelClass: ['error-snackbar'] }
-            );
           }
         });
         return;
@@ -325,13 +297,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
             UI_MESSAGES.adminDashboard.deleteTaskSuccess,
             UI_MESSAGES.common.closeAction,
             { duration: 3000, panelClass: ['success-snackbar'] }
-          );
-        },
-        error: () => {
-          this.snackBar.open(
-            UI_MESSAGES.adminDashboard.deleteTaskError,
-            UI_MESSAGES.common.closeAction,
-            { duration: 3000, panelClass: ['error-snackbar'] }
           );
         }
       });

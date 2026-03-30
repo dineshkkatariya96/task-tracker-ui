@@ -46,7 +46,7 @@ export class TaskService {
     return this.http.patch<Task>(`${this.apiUrl}/${id}/status?status=${status}`, {});
   }
 
-  deleteTask(id: number): Observable<any> {
+  deleteTask(id: number): Observable<string> {
     return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
 }

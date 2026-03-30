@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { ActivityLogService } from '../../services/activity-log.service';
 import { UI_MESSAGES } from '../../constants/ui-messages';
@@ -99,10 +100,13 @@ export class RegisterComponent {
       name: this.name,
       email: this.email,
       password: this.password
-    }).subscribe({
-      next: () => {
+    }).pipe(
+      finalize(() => {
         this.loading = false;
         this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: () => {
         this.activityLogService.log('auth', 'Registration completed', {
           status: 'success',
           details: {
@@ -113,24 +117,6 @@ export class RegisterComponent {
           duration: 3000
         });
         this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.cdr.detectChanges();
-        this.activityLogService.log('auth', 'Registration failed', {
-          level: 'error',
-          status: 'failure',
-          details: {
-            email: this.email,
-            responseStatus: err.status,
-            errorMessage: err.error
-          }
-        });
-        this.snackBar.open(
-          err.error || UI_MESSAGES.register.registrationError,
-          UI_MESSAGES.common.closeAction,
-          { duration: 4000 }
-        );
       }
     });
   }

@@ -88,18 +88,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadMyTasks() {
-    this.taskService.getMyTasks().subscribe({
-      next: (tasks) => {
-        this.myTasks = tasks;
-        this.overdueTasks = tasks.filter((task) => task.overdue || task.status === 'OVERDUE');
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error loading my tasks:', err);
-        if (err.status === 401) {
-          this.router.navigate(['/login']);
-        }
-      }
+    this.taskService.getMyTasks().subscribe((tasks) => {
+      this.myTasks = tasks;
+      this.overdueTasks = tasks.filter((task) => task.overdue || task.status === 'OVERDUE');
+      this.cdr.detectChanges();
     });
   }
 
@@ -139,12 +131,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.snackBar.open(MESSAGES.TASK.STATUS_UPDATED, 'Close', {
           duration: 3000,
           panelClass: ['success-snackbar']
-        });
-      },
-      error: () => {
-        this.snackBar.open(MESSAGES.TASK.STATUS_UPDATE_FAILED, 'Close', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
         });
       }
     });

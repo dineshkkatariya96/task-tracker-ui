@@ -39,7 +39,7 @@ export class AuthService {
     );
   }
 
-  register(request: RegisterRequest): Observable<any> {
+  register(request: RegisterRequest): Observable<string> {
     return this.http.post(
       `${this.apiUrl}/register`,
       request,

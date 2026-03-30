@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { ActivityLogService } from '../../services/activity-log.service';
 import { UI_MESSAGES } from '../../constants/ui-messages';
@@ -68,31 +69,19 @@ export class LoginComponent {
     });
 
     this.authService.login({ email: this.email, password: this.password })
-      .subscribe({
-        next: (response) => {
+      .pipe(
+        finalize(() => {
           this.loading = false;
           this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (response) => {
           if (response.role === 'ADMIN') {
             this.router.navigate(['/admin']);
           } else {
             this.router.navigate(['/employee']);
           }
-        },
-        error: (error) => {
-          this.loading = false;
-          this.cdr.detectChanges();
-          this.activityLogService.log('auth', 'Login failed', {
-            level: 'error',
-            status: 'failure',
-            details: {
-              email: this.email,
-              responseStatus: error.status
-            }
-          });
-          this.snackBar.open(UI_MESSAGES.login.invalidCredentials, UI_MESSAGES.common.closeAction, {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          });
         }
       });
   }

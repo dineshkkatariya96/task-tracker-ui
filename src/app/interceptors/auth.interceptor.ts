@@ -19,7 +19,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      if (error.status === 401 && shouldHandleUnauthorized(req.url, token)) {
         activityLogService.log('auth', 'Session expired or unauthorized request intercepted', {
           level: 'warn',
           status: 'failure',
@@ -36,3 +36,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
+
+function shouldHandleUnauthorized(url: string, token: string | null): boolean {
+  return !!token && !url.includes('/api/auth/');
+}
